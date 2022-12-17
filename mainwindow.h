@@ -30,5 +30,7 @@ private:
     UsageModel *_usageModel;
     UsageGatherer *_usageGatherer;
     GathererStatusModel *_gathererStatusModel;
+
+    QString _currentDrive;
 };
 #endif // MAINWINDOW_H

@@ -92,7 +92,9 @@ void UsageGatherer::run()
                 continue;
             }
 
-            _rootChanged.storeRelease(0);
+            if (_rootChanged.testAndSetOrdered(1, 0)) {
+                _usageByDir.clear();
+            }
 
             calculateDirectoryUsage(root);
 
@@ -131,7 +133,7 @@ void UsageGatherer::setRootPath(const QString &rootPath)
 
 std::unordered_map<QString, FilesUsage> UsageGatherer::calculateDirectoryUsage(QDir currentDir)
 {
-    if (isInterruptionRequested() || _rootChanged.loadAcquire()) {
+    if (isInterruptionRequested() || _rootChanged.loadAcquire() == 1) {
         return {};
     }
     std::unordered_map<QString, FilesUsage> res;
@@ -177,7 +179,8 @@ std::unordered_map<QString, FilesUsage> UsageGatherer::calculateDirectoryUsage(Q
         }
     }
 
-    emit statusInfo({currentDirPath});
+    emit statusInfo({currentDirPath,
+                    "Directories processed: " + QString::number(_usageByDir.size())});
 
     return res;
 }

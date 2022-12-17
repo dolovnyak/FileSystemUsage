@@ -74,10 +74,19 @@ MainWindow::~MainWindow()
 void MainWindow::driveSelected(const QModelIndex &index)
 {
     qInfo() << this << Q_FUNC_INFO << QThread::currentThreadId();
-    QString rootPath = _fileSystemModel->filePath(index);
+
+    QString rootPath = _driveModel->filePath(index);
+    _usageModel->selectDirectory(rootPath);
+    _usageGatherer->selectDirectory(rootPath);
+
+    if (rootPath == _currentDrive) {
+        return;
+    }
+    _currentDrive = rootPath;
     _fileSystemModel->setRootPath(rootPath);
     _usageGatherer->setRootPath(rootPath);
 
+    ui->fileSystemView->setRootIndex(_fileSystemModel->index(rootPath));
     ui->fileSystemView->show();
 }
 
