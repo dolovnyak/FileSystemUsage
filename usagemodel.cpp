@@ -1,6 +1,6 @@
 #include "usagemodel.h"
 
-UsageModel::UsageModel(QFileSystemModel *fileSystemModel) : _fileSystemModel(fileSystemModel)
+UsageModel::UsageModel()
 {
     qInfo() << this << Q_FUNC_INFO << QThread::currentThreadId();
 }
@@ -64,14 +64,11 @@ QVariant UsageModel::headerData(int section, Qt::Orientation orientation, int ro
     return QVariant();
 }
 
-void UsageModel::selectDirectory(const QModelIndex &index)
+void UsageModel::selectDirectory(const QString &directoryPath)
 {
     qInfo() << this << Q_FUNC_INFO << QThread::currentThreadId();
 
-    _selectedDirectoryPath = _fileSystemModel->filePath(index);
-
-    emit directorySelected(_selectedDirectoryPath);
-
+    _selectedDirectoryPath = directoryPath;
     this->beginResetModel();
     _selectedDirectoryUsage = {{"All", "--", "--", "--", "--"}};
     this->endResetModel();

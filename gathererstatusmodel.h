@@ -13,7 +13,7 @@ public:
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
 
 public slots:
-    void UpdateStatus(const QVector<QString>& statuses);
+    void UpdateStatus(const QVector<QString> &statuses);
 
 private:
     QVector<QString> _statuses;

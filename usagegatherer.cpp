@@ -3,7 +3,7 @@
 
 namespace {
 
-QVector<ModelView> toModelView(qint64 subdirsQuantity, const std::unordered_map<QString, FilesUsage>& map) {
+QVector<ModelView> toModelView(qint64 subdirsQuantity, const std::unordered_map<QString, FilesUsage> &map) {
     QVector<ModelView> res;
 
     res.push_back({"All", 0, 0, 0, 0});
@@ -63,7 +63,7 @@ FilesUsage &FilesUsage::operator+(const FilesUsage &other)
     return *this;
 }
 
-UsageGatherer::UsageGatherer(const QString& root) : _root(root)
+UsageGatherer::UsageGatherer()
 {
     qInfo() << this << Q_FUNC_INFO << QThread::currentThreadId();
 }
@@ -87,6 +87,13 @@ void UsageGatherer::run()
             QString root = _root;
             _rootMutex.unlock();
 
+            if (root.isEmpty()) {
+                QThread::msleep(5); /// sleep until drive selected
+                continue;
+            }
+
+            _rootChanged.storeRelease(0);
+
             calculateDirectoryUsage(root);
 
             if (clearObsoleteNodesTimer.hasExpired(CLEAR_OBSOLETE_NODES_TIMEOUT_MS)) {
@@ -95,12 +102,12 @@ void UsageGatherer::run()
             }
         }
     }
-    catch (const std::exception& e) {
+    catch (const std::exception &e) {
         qCritical() << e.what();
     }
 }
 
-void UsageGatherer::selectDirectory(const QString& directoryPath)
+void UsageGatherer::selectDirectory(const QString &directoryPath)
 {
     qInfo() << this << Q_FUNC_INFO << QThread::currentThreadId();
 
@@ -111,23 +118,28 @@ void UsageGatherer::selectDirectory(const QString& directoryPath)
     _directoryChanged.storeRelease(1);
 }
 
-void UsageGatherer::changeRoot(const QString &rootPath)
+void UsageGatherer::setRootPath(const QString &rootPath)
 {
     qInfo() << this << Q_FUNC_INFO << QThread::currentThreadId();
 
     _rootMutex.lock();
     _root = rootPath;
     _rootMutex.unlock();
+
+    _rootChanged.storeRelease(1);
 }
 
 std::unordered_map<QString, FilesUsage> UsageGatherer::calculateDirectoryUsage(QDir currentDir)
 {
+    if (isInterruptionRequested() || _rootChanged.loadAcquire()) {
+        return {};
+    }
     std::unordered_map<QString, FilesUsage> res;
     qint64 subdirsQuantity = 0;
     QFileInfoList filesList = currentDir.entryInfoList(QDir::NoDotAndDotDot | QDir::Dirs | QDir::Files | QDir::NoSymLinks, QDir::NoSort);
     QString currentDirPath = currentDir.absolutePath();
 
-    for (auto& elem : filesList) {
+    for (auto &elem : filesList) {
         if (elem.isFile()) {
             QString extension = "." + elem.suffix();
 

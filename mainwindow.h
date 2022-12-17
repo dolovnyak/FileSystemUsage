@@ -17,10 +17,16 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+private slots:
+    void driveSelected(const QModelIndex &index);
+
+    void directorySelected(const QModelIndex &index);
+
 private:
     Ui::MainWindow *ui;
 
-    QFileSystemModel *_dirModel;
+    QFileSystemModel *_driveModel;
+    QFileSystemModel *_fileSystemModel;
     UsageModel *_usageModel;
     UsageGatherer *_usageGatherer;
     GathererStatusModel *_gathererStatusModel;

@@ -21,7 +21,7 @@ public:
 
 class FilesUsage {
 public:
-    FilesUsage& operator+(const FilesUsage &other);
+    FilesUsage &operator+(const FilesUsage &other);
 
     qint64 filesQuantity;
     qint64 filesTotalSize;
@@ -38,21 +38,21 @@ class UsageGatherer : public QThread
 {
     Q_OBJECT
 public:
-    UsageGatherer(const QString &root);
+    UsageGatherer();
 
     ~UsageGatherer();
 
     void run() override;
+
+    void setRootPath(const QString &rootPath); /// thread safe
+
+    void selectDirectory(const QString &directoryPath); /// thread safe
 
 signals:
     void selectedDirectoryChanged(QString directoryPath, QVector<ModelView> directoryUsage);
 
     void statusInfo(QVector<QString> statuses);
 
-public slots:
-    void selectDirectory(const QString &directoryPath);
-
-    void changeRoot(const QString &rootPath);
 
 private:
     std::unordered_map<QString, FilesUsage> calculateDirectoryUsage(QDir currentDir);
@@ -63,10 +63,10 @@ private:
 
     QString _root;
     QMutex _rootMutex;
+    QAtomicInt _rootChanged;
 
     QString _selectedDirectoryPath;
     QMutex _selectedDirectoryMutex;
-
     QAtomicInt _directoryChanged;
 };
 
