@@ -97,6 +97,11 @@
                    <verstretch>1</verstretch>
                   </sizepolicy>
                  </property>
+                 <property name="font">
+                  <font>
+                   <family>Arial</family>
+                  </font>
+                 </property>
                 </widget>
                </item>
                <item>
@@ -106,6 +111,11 @@
                    <horstretch>0</horstretch>
                    <verstretch>6</verstretch>
                   </sizepolicy>
+                 </property>
+                 <property name="font">
+                  <font>
+                   <family>Arial</family>
+                  </font>
                  </property>
                 </widget>
                </item>
@@ -124,6 +134,7 @@
             </property>
             <property name="font">
              <font>
+              <family>Arial</family>
               <pointsize>13</pointsize>
               <bold>false</bold>
              </font>
@@ -140,6 +151,11 @@
          <horstretch>0</horstretch>
          <verstretch>1</verstretch>
         </sizepolicy>
+       </property>
+       <property name="font">
+        <font>
+         <family>Arial</family>
+        </font>
        </property>
       </widget>
      </widget>
